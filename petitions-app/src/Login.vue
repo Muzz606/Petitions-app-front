@@ -55,7 +55,7 @@ export default {
           //console.log(response.data.token);
           if(response.data.token !== undefined) {
             Vue.$cookies.set("CookieToken", [response.data.token.toString()], "2h");
-            //this.$cookies.set("CookieId", response.data.userId, "2h");
+            Vue.$cookies.set("CookieId", response.data.userId, "2h");
             //this.$cookies.set("CookiePassword", this.inputPassword);
             window.location.href = '/';
             //console.log(Vue.$cookies.get("CookieToken"));

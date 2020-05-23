@@ -24,14 +24,10 @@ use this for petition details
     <b-modal id="detailsModal" hide-footer>
       <template v-slot:modal-title>
 <!--        add for the details of petition-->
-        {{current}}
+        {{petitions[current-1].title}}
       </template>
       <div class="d-block text-center">
-        <form action="">
-          <fieldset>
-            <legend>Register:</legend>
-          </fieldset>
-        </form>
+<!-- TODO: mayb do for petition in petitions. run quicker as only gets displayed petitions. but will be always updating. need to add get for petition id so i can have descr etc.-->
       </div>
       <b-button block @click="$bvModal.hide('detailsModal')">Close Me</b-button>
     </b-modal>
@@ -47,7 +43,7 @@ use this for petition details
         </div>
       </div>
       <div v-if="authenticated">
-        <h5><u>Home</u> | <a href="">My Petitions</a> | <a href="">Edit Profile</a> </h5>
+        <h5><u>Home</u> | <a href="/myPetitions">My Petitions</a> | <a href="">Edit Profile</a> </h5>
 <!--        TODO: implement logout functionality:  DONE -->
         <b-button variant="outline-primary" id="logOut" v-on:click="logOut">Log Out</b-button>
       </div>
@@ -57,31 +53,30 @@ use this for petition details
       <hr>
     </div>
 <!--    Main part of page-->
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Petition Id</th>
-            <th scope="col">Title</th>
-            <th scope="col">Category</th>
-            <th scope="col">Author</th>
-            <th scope="col"># Signatures</th>
-          </tr>
+    <div id="tableDiv" align="center">
+      <table class="table table-hover table-bordered" id="mainTable">
+        <thead class="thead-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Petition Id</th>
+          <th scope="col">Title</th>
+          <th scope="col">Category</th>
+          <th scope="col">Author</th>
+          <th scope="col"># Signatures</th>
+        </tr>
         </thead>
         <tbody v-for="petition in petitions">
-          <tr>
-            <th scope="row">{{petition.rowNumber}}</th>
-            <td>{{petition.id}}</td>
-            <td>{{petition.title}}</td>
-            <td>{{petition.category}}</td>
-            <td>{{petition.author}}</td>
-            <td>{{petition.signs}}</td>
-            <td><b-button id="details" v-on:click="current = petition.rowNumber" v-b-modal="'detailsModal'">Details</b-button></td>
-          </tr>
+        <tr>
+          <th scope="row">{{petition.rowNumber}}</th>
+          <td>{{petition.id}}</td>
+          <td>{{petition.title}}</td>
+          <td>{{petition.category}}</td>
+          <td>{{petition.author}}</td>
+          <td>{{petition.signs}}</td>
+          <td><b-button id="details" v-on:click="current = petition.rowNumber" v-b-modal="'detailsModal'">Details</b-button></td>
+        </tr>
         </tbody>
       </table>
-    <div>
-
     </div>
   </body>
 </template>
@@ -112,6 +107,7 @@ use this for petition details
         this.$http.post('http://localhost:4941/api/v1/users/logout',"", config)
           .then(function () {
             Vue.$cookies.remove("CookieToken");
+            Vue.$cookies.remove("CookieId");
             window.location.href = '/';
           })
       },
@@ -122,9 +118,9 @@ use this for petition details
       getPetitions: function () {
         this.$http.get('http://localhost:4941/api/v1/petitions')
           .then(function (response) {
-            for (let i = 1; i < response.data.length; i++) {
+            for (let i = 0; i < response.data.length; i++) {
               let temp = {
-                rowNumber: i,
+                rowNumber: i + 1,
                 id: response.data[i].petitionId,
                 title: response.data[i].title,
                 category: response.data[i].category,
@@ -160,5 +156,8 @@ use this for petition details
     position: absolute;
     top: 7px;
     right: 5px;
+  }
+  #tableDiv {
+    margin: 10px;
   }
 </style>

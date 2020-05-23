@@ -2,6 +2,8 @@ import App from './App.vue';
 import Home from './Home.vue';
 import Login from './Login.vue';
 import Register from "./Register.vue";
+import MyPetitions from "./MyPetitions";
+import Profile from "./Profile";
 
 import Vue from 'vue';
 import VueResource from 'vue-resource';
@@ -33,6 +35,14 @@ const routes = [
   {
     path: "/register",
     component: Register
+  },
+  {
+    path: "/myPetitions",
+    component: MyPetitions
+  },
+  {
+    path: "/profile",
+    component: Profile
   }
 ];
 
