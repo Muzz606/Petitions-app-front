@@ -24,12 +24,12 @@ use this for petition details
     <b-modal id="detailsModal" hide-footer>
       <template v-slot:modal-title>
 <!--        add for the details of petition-->
-        {{petitions[current-1].title}}
+        {{currentDetails}}
       </template>
       <div class="d-block text-center">
 <!-- TODO: mayb do for petition in petitions. run quicker as only gets displayed petitions. but will be always updating. need to add get for petition id so i can have descr etc.-->
       </div>
-      <b-button block @click="$bvModal.hide('detailsModal')">Close Me</b-button>
+      <b-button variant="btn btn-danger" @click="$bvModal.hide('detailsModal')">Close</b-button>
     </b-modal>
 
   <!--    Header of home page-->
@@ -45,7 +45,7 @@ use this for petition details
       <div v-if="authenticated">
         <h5><u>Home</u> | <a href="/myPetitions">My Petitions</a> | <a href="">Edit Profile</a> </h5>
 <!--        TODO: implement logout functionality:  DONE -->
-        <b-button variant="outline-primary" id="logOut" v-on:click="logOut">Log Out</b-button>
+        <b-button variant="outline-danger" class="btn-sm" id="logOut" v-on:click="logOut">Log Out</b-button>
       </div>
       <div v-else>
         <h5><u>Home</u></h5>
@@ -58,22 +58,24 @@ use this for petition details
         <thead class="thead-dark">
         <tr>
           <th scope="col">#</th>
-          <th scope="col">Petition Id</th>
           <th scope="col">Title</th>
           <th scope="col">Category</th>
           <th scope="col">Author</th>
+          <th>Hero image here</th>
           <th scope="col"># Signatures</th>
         </tr>
         </thead>
         <tbody v-for="petition in petitions">
         <tr>
           <th scope="row">{{petition.rowNumber}}</th>
-          <td>{{petition.id}}</td>
           <td>{{petition.title}}</td>
           <td>{{petition.category}}</td>
-          <td>{{petition.author}}</td>
+          <td>{{petition.author}} need to add profile details</td>
+          <td>hero image here</td>
           <td>{{petition.signs}}</td>
-          <td><b-button id="details" v-on:click="current = petition.rowNumber" v-b-modal="'detailsModal'">Details</b-button></td>
+          <td v-on:click="getPetitionDetails(currentRow)">
+            <b-button id="details" variant="outline-secondary" v-on:click="currentRow = petition.rowNumber - 1" v-b-modal="'detailsModal'">Details</b-button>
+          </td>
         </tr>
         </tbody>
       </table>
@@ -91,8 +93,9 @@ use this for petition details
         errorFlag: false,
         authenticated: false,
         petitions: [],
-        cookie: null,
-        current: null
+        currentDetails: {},
+        currentRow: 0,
+        cookie: null
       }
     },
     mounted: function () {
@@ -125,11 +128,30 @@ use this for petition details
                 title: response.data[i].title,
                 category: response.data[i].category,
                 author: response.data[i].authorName,
-                signs: response.data[i].signatureCount,
-                modalName: "detailsModal" + i.toString()
+                signs: response.data[i].signatureCount
               }
               this.petitions.push(temp);
             }
+          })
+      },
+      // TODO: need to add get for author prof,name,city,country
+      getPetitionDetails: function (petitionRow) {
+        let petitionId = this.petitions[petitionRow].id;
+        console.log(petitionId);
+        this.$http.get('http://localhost:4941/api/v1/petitions/' + petitionId)
+          .then(function (response) {
+              let temp = {
+                title: response.data.title,
+                category: response.data.category,
+                author: response.data.authorName,
+                signs: response.data.signatureCount,
+                description: response.data.description,
+                authorCity: response.data.authorCity,
+                authorCountry: response.data.authorCountry,
+                createdDate: response.data.createdDate,
+                closingDate: response.data.closingDate
+              }
+              this.currentDetails = temp;
           })
       }
     }
