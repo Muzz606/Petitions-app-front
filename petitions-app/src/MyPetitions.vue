@@ -5,8 +5,8 @@
         <h1>PETITIONS</h1>
       </div>
       <div>
-        <h5><a href="/">Home</a> | <u>My Petitions</u> | <a href="/profile">Edit Profile</a> </h5>
-        <b-button variant="outline-primary" id="logOut" v-on:click="logOut">Log Out</b-button>
+        <h5><a href="/">Home</a> | <u>My Petitions</u> | <a href="/profile">Profile</a> </h5>
+        <b-button variant="outline-danger" class="btn-sm" id="logOut" v-on:click="logOut">Log Out</b-button>
       </div>
       <hr>
     </div>
@@ -19,46 +19,58 @@
           <form>
             <div class="form-group mx-sm-3 mb-2">
               <label for="editEmptyTitle">Title:</label>
-              <input type="text" class="form-control" placeholder="Enter a Title..." id="editEmptyTitle">
+              <input v-model="petitionForm.title" type="text" class="form-control" placeholder="Enter a Title..." id="editEmptyTitle">
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <label for="editEmptyDescription">Description:</label>
               <textarea v-model="petitionForm.description" class="form-control" id="editEmptyDescription" placeholder="Please describe your petition..."></textarea>
             </div>
             <div class="form-group mx-sm-3 mb-2">
+              <label for="emptyCategory">Category:</label>
+              <select id="emptyCategory" v-model="petitionForm.categoryId">
+                <option value="1">Animals</option>
+                <option value="2">Environment</option>
+                <option value="3">Entertainment</option>
+                <option value="4">Human Rights</option>
+                <option value="5">Immigration</option>
+                <option value="6">Justice</option>
+                <option value="7">Other</option>
+              </select>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
               <label for="editEmptyImage">Petition Image:</label>
-              <input type="text" class="form-control" placeholder="Upload a image..." id="editEmptyImage">
+              <input readonly type="text" class="form-control" placeholder="Upload a image..." id="editEmptyImage">
             </div>
             <div id="dateTimePicker" class="form-group mx-sm-3 mb-2">
               <label for="editEmptyDate">Closing date:</label>
-              <input data-format="yyyy/MM/dd hh:mm:ss" type="text" class="form-control" placeholder="YYYY/MM/DD HH:MM:SS" id="editEmptyDate">
+              <input v-model="petitionForm.closingDate" data-format="yyyy/MM/dd hh:mm:ss" type="text" class="form-control" placeholder="YYYY/MM/DD HH:MM:SS" id="editEmptyDate">
             </div>
             <div align="center">
-              <b-button id="Create" type="button" v-on:click="" value="submit" variant="outline-primary">Create</b-button>
+              <b-button id="Create" type="button" v-on:click="createPetition" value="submit" variant="outline-primary">Create</b-button>
             </div>
           </form>
         </div>
         <div v-else>
           <form>
             <div>
-              image here editable
+              <img width="120" height="100" onerror="if (this.src !== '/photos/noImage.png') this.src = '/photos/noImage.png'" v-bind:src="currentPetition[0].source">
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <label for="Title">Title:</label>
-              <input type="text" class="form-control" id="Title" v-bind:value="currentPetition[0].title">
+              <input type="text" class="form-control" id="Title" v-bind:value="currentPetition[0].data.title">
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <label for="Description">Description:</label>
-              <textarea type="text" class="form-control" id="Description" v-bind:value="currentPetition[0].description"></textarea>
+              <textarea type="text" class="form-control" id="Description" v-bind:value="currentPetition[0].data.description"></textarea>
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <label for="Author">Author:</label>
-              <p type="text" readonly class="form-control" id="Author"> <span>{{currentPetition[0].authorName}}: </span><a href="/profile"><b>Details</b></a></p>
+              <p type="text" readonly class="form-control" id="Author"> <span>{{currentPetition[0].data.authorName}}: </span><a href="/profile"><b>Details</b></a></p>
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <label for="Signatures">Signatures:</label>
               <!--            wont be null as petitions created will add a signature-->
-              <input type="text" readonly class="form-control" id="Signatures" v-bind:value="currentPetition[0].signatureCount">
+              <input type="text" readonly class="form-control" id="Signatures" v-bind:value="currentPetition[0].data.signatureCount">
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <label for="Signers">Signers:</label>
@@ -66,15 +78,15 @@
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <label for="Category">Category:</label>
-              <input type="text" class="form-control" id="Category" v-bind:value="currentPetition[0].category">
+              <input type="text" class="form-control" id="Category" v-bind:value="currentPetition[0].data.category">
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <label for="CreatedDate">Date Created:</label>
-              <input type="text" readonly class="form-control" id="CreatedDate" v-bind:value="currentPetition[0].createdDate">
+              <input type="text" readonly class="form-control" id="CreatedDate" v-bind:value="currentPetition[0].data.createdDate">
             </div>
             <div class="form-group mx-sm-3 mb-2">
               <label for="ClosingDate">Closing Date:</label>
-              <input type="text" class="form-control" id="ClosingDate" v-bind:value="currentPetition[0].closingDate">
+              <input placeholder="No Closing Date" type="text" class="form-control" id="ClosingDate" v-bind:value="currentPetition[0].data.closingDate">
             </div>
             <div align="center">
               <b-button id="Save" type="button" v-on:click="" value="submit" variant="outline-primary">Save</b-button>
@@ -86,25 +98,25 @@
 <!--      if not editing-->
       <div v-if="!edit">
         <form>
-          <div>
-            image here
+          <div align="center">
+            <img width="120" height="100" onerror="if (this.src !== '/photos/noImage.png') this.src = '/photos/noImage.png'" v-bind:src="currentPetition[0].source">
           </div>
           <div class="form-group mx-sm-3 mb-2">
             <label for="staticTitle">Title:</label>
-            <input type="text" readonly class="form-control" id="staticTitle" v-bind:value="currentPetition[0].title">
+            <input type="text" readonly class="form-control" id="staticTitle" v-bind:value="currentPetition[0].data.title">
           </div>
           <div class="form-group mx-sm-3 mb-2">
             <label for="staticDescription">Description:</label>
-            <textarea type="text" readonly class="form-control" id="staticDescription" v-bind:value="currentPetition[0].description"></textarea>
+            <textarea type="text" readonly class="form-control" id="staticDescription" v-bind:value="currentPetition[0].data.description"></textarea>
           </div>
           <div class="form-group mx-sm-3 mb-2">
             <label for="staticAuthor">Author:</label>
-            <p type="text" readonly class="form-control" id="staticAuthor"> <span>{{currentPetition[0].authorName}}: </span><a href="/profile"><b>Details</b></a></p>
+            <p type="text" readonly class="form-control" id="staticAuthor"> <span>{{currentPetition[0].data.authorName}}: </span><a href="/profile"><b>Details</b></a></p>
           </div>
           <div class="form-group mx-sm-3 mb-2">
             <label for="staticSignatures">Signatures:</label>
 <!--            wont be null as petitions created will add a signature-->
-            <input type="text" readonly class="form-control" id="staticSignatures" v-bind:value="currentPetition[0].signatureCount">
+            <input type="text" readonly class="form-control" id="staticSignatures" v-bind:value="currentPetition[0].data.signatureCount">
           </div>
           <div class="form-group mx-sm-3 mb-2">
             <label for="staticSigners">Signers:</label>
@@ -112,15 +124,15 @@
           </div>
           <div class="form-group mx-sm-3 mb-2">
             <label for="staticCategory">Category:</label>
-            <input type="text" readonly class="form-control" id="staticCategory" v-bind:value="currentPetition[0].category">
+            <input type="text" readonly class="form-control" id="staticCategory" v-bind:value="currentPetition[0].data.category">
           </div>
           <div class="form-group mx-sm-3 mb-2">
             <label for="staticCreatedDate">Date Created:</label>
-            <input type="text" readonly class="form-control" id="staticCreatedDate" v-bind:value="currentPetition[0].createdDate">
+            <input type="text" readonly class="form-control" id="staticCreatedDate" v-bind:value="currentPetition[0].data.createdDate">
           </div>
           <div class="form-group mx-sm-3 mb-2">
             <label for="staticClosingDate">Closing Date:</label>
-            <input type="text" readonly class="form-control" id="staticClosingDate" v-bind:value="currentPetition[0].closingDate">
+            <input placeholder="No Closing Date" type="text" readonly class="form-control" id="staticClosingDate" v-bind:value="currentPetition[0].data.closingDate">
           </div>
           <div align="center">
             <b-button id="Edit" type="button" v-on:click="edit = true" value="add" variant="primary">Edit Petition</b-button>
@@ -149,7 +161,10 @@
         petitionIndex: 0,
         currentPetition: [],
         petitionForm: {
-          description: ""
+          title: "",
+          description: "",
+          categoryId: "",
+          date: ""
         }
       }
     },
@@ -186,9 +201,14 @@
             for (let i = 0; i < this.petitions.length; i++) {
               this.$http.get('http://localhost:4941/api/v1/petitions/' + this.petitions[i].petitionId)
                 .then(function (response) {
-                  this.userPetitions.push(response.data);
+                  let temp = {
+                    data: response.data,
+                    source: "http://localhost:4941/api/v1/petitions/" + response.data.petitionId.toString() + "/photo"
+
+                }
+                  this.userPetitions.push(temp);
                   if (i === 0) {
-                    this.currentPetition.push(response.data);
+                    this.currentPetition.push(temp);
                   }
                 })
             }
@@ -224,6 +244,19 @@
           this.emptyPetition = false;
           this.currentPetition = [this.userPetitions[this.petitionIndex]];
         }
+      },
+      createPetition: function () {
+        const config = {
+          headers: {'X-Authorization': this.cookie.toString()}
+        }
+        this.$http.post('http://localhost:4941/api/v1/petitions', this.petitionForm, config)
+          .then(function (response) {
+            if (response.data.petitionId === undefined) {
+              alert("Please Fill all fields");
+            } else {
+              window.location.href = "/myPetitions";
+            }
+          })
       }
     }
   }
