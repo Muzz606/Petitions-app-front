@@ -139,7 +139,7 @@ use this for petition details
           <td v-bind:id="petition.id"><img width="120" height="100" onerror="if (this.src !== '/photos/noImage.png') this.src = '/photos/noImage.png'" v-bind:src="petition.source"></td>
           <td>{{petition.signs}}</td>
           <td v-on:mouseover="getPetitionDetails(currentRow)">
-            <!---<div v-if="authenticated">
+            <!--<div v-if="authenticated">
               <div v-if="!signersDetails[petition.id - 1].signed" align="center">
                 <b-button variant="outline-secondary" v-b-modal="'detailsModal'">Details</b-button>
                 <hr>
@@ -150,7 +150,7 @@ use this for petition details
                 <hr>
                 <b-button variant="outline-warning" v-on:click="">Remove Signature</b-button>
               </div>
-            </div> !!!MOVED TO MODAL BECAUSE OF RENDERING ERRORS   --->
+            </div> !!!MOVED TO MODAL BECAUSE OF RENDERING ERRORS   -->
             <div v-on:click="currentRow = petition.rowNumber - 1">
               <b-button id="details" v-on:click="getSignatory(petitions[currentRow].id)" variant="outline-secondary"  v-b-modal="'detailsModal'">Details</b-button>
             </div>
